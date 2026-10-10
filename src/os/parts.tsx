@@ -22,31 +22,45 @@ export function AronaSLogo({ glitch = true }: { glitch?: boolean }) {
       fill="none"
       aria-label="Arona S logo"
     >
-      {/* Stylized angular "S" built from facets */}
+      {/* Stylized faceted "S" matching the reference */}
       <g fill="#ffffff">
-        <path d="M18 8 H86 L104 26 V44 L46 26 Z" />
-        <path d="M18 8 L34 26 V70 L18 52 Z" />
-        <path d="M34 70 H96 L112 88 V106 L50 88 Z" />
-        <path d="M96 88 L112 106 V150 L96 132 Z" />
-        <path d="M32 132 H96 L112 150 L94 170 H26 L10 152 Z" />
-        <path d="M10 96 L26 114 V70 L10 52 Z" opacity="0.92" />
+        {/* Top bar */}
+        <path d="M28 12 H88 L106 28 L92 42 H28 Z" />
+        <path d="M28 12 L42 28 V42 H28 Z" opacity="0.95" />
+        {/* Top-right facet */}
+        <path d="M88 12 L106 28 V44 L92 42 Z" fill="#e8f6ff" />
+        {/* Upper diagonal */}
+        <path d="M42 42 H92 L78 68 H42 Z" />
+        <path d="M42 42 L56 68 V84 L42 68 Z" opacity="0.9" />
+        {/* Middle bar */}
+        <path d="M42 68 H92 L106 84 L92 100 H42 Z" />
+        <path d="M92 68 L106 84 V100 L92 100 Z" fill="#e8f6ff" />
+        {/* Lower diagonal */}
+        <path d="M56 100 H92 L78 126 H56 Z" />
+        <path d="M56 100 L70 126 V142 L56 126 Z" opacity="0.9" />
+        {/* Bottom bar */}
+        <path d="M28 126 H78 L96 142 L82 158 H28 Z" />
+        <path d="M28 126 L42 142 V158 H28 Z" opacity="0.95" />
+        <path d="M78 126 L96 142 V158 L82 158 Z" fill="#e8f6ff" />
       </g>
-      <g fill="#bfe9ff" opacity="0.85">
-        <path d="M46 26 L104 26 L96 34 L46 34 Z" />
-        <path d="M50 88 L112 88 L104 96 L50 96 Z" />
+      {/* Cyan edge highlights */}
+      <g stroke="#4de3ff" strokeWidth="2.5" opacity="0.9" fill="none">
+        <path d="M92 42 L106 28" />
+        <path d="M92 100 L106 84" />
+        <path d="M42 68 L56 84" />
       </g>
     </svg>
   );
 }
 
-/** 12 drifting triangles for the gate background. */
+/** Small drifting triangles overlay for the gate. */
 export function GateTriangles() {
   const tris = useMemo(() => {
     const arr = [];
     for (let i = 0; i < 12; i++) {
       const left = (i * 83 + 13) % 96;
       const top = (i * 47 + 7) % 88;
-      const size = 22 + ((i * 29) % 46);
+      const size = 16 + ((i * 13) % 20);
       const delay = -(1 + ((i * 1.7) % 7));
       const dur = 6.4 + ((i * 0.9) % 4.1);
       arr.push({ left, top, size, delay, dur, key: i });

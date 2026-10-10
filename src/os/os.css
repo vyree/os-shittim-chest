@@ -124,29 +124,65 @@
 
 .gate-bg {
   position: absolute;
-  inset: -4%;
-  background:
-    radial-gradient(60% 45% at 70% 25%, rgba(255,255,255,0.35), transparent 70%),
-    radial-gradient(50% 40% at 20% 80%, rgba(255,182,213,0.28), transparent 70%),
-    linear-gradient(165deg, #8fd0ea 0%, #72c4e3 40%, #5fb3dd 70%, #4a9fd1 100%);
+  inset: 0;
+  background: url('/gate-bg.jpg') center/cover no-repeat;
   animation: gate-image-breathe 10s ease-in-out infinite alternate;
 }
 @keyframes gate-image-breathe {
   from { transform: scale(1.018); }
   to { transform: scale(1.045); }
 }
-/* triangular facet pattern */
+/* S logo glitch overlay - positioned over the S in the reference image */
+.gate-s-glitch {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 120px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: s-glitch 5.2s steps(1) infinite;
+}
+@keyframes s-glitch {
+  0%, 89% { 
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  90% { 
+    opacity: 1;
+    transform: translate(calc(-50% - 4px), calc(-50% + 2px));
+    background: linear-gradient(90deg, rgba(255,60,120,0.3) 0%, transparent 50%, rgba(60,220,255,0.3) 100%);
+    clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+  }
+  92% { 
+    opacity: 1;
+    transform: translate(calc(-50% + 4px), calc(-50% - 2px));
+    background: linear-gradient(90deg, rgba(60,220,255,0.3) 0%, transparent 50%, rgba(255,60,120,0.3) 100%);
+    clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+  }
+  94% { 
+    opacity: 0.5;
+    transform: translate(calc(-50% - 2px), -50%);
+  }
+  95%, 100% { 
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Small moving triangles overlay */
 .gate-triangles {
   position: absolute;
   inset: 0;
-  opacity: 0.5;
+  opacity: 0.4;
+  pointer-events: none;
 }
 .gate-tri {
   position: absolute;
   width: 0; height: 0;
-  border-left: 34px solid transparent;
-  border-right: 34px solid transparent;
-  border-bottom: 58px solid rgba(255,255,255,0.22);
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 20px solid rgba(255,255,255,0.35);
   animation: triangle-drift 7s ease-in-out infinite alternate;
 }
 @keyframes triangle-drift {
@@ -209,16 +245,16 @@
 }
 .gate-ver {
   font-family: 'Fredoka', sans-serif;
-  font-size: clamp(28px, 4.5vw, 52px);
-  font-weight: 500;
-  color: rgba(255,255,255,0.9);
-  letter-spacing: 0.08em;
-  text-shadow: 0 2px 12px rgba(23,74,121,0.3);
+  font-size: clamp(42px, 7vw, 84px);
+  font-weight: 300;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 20px rgba(23,74,121,0.25);
 }
 .gate-logo {
-  width: clamp(88px, 12vw, 158px);
+  width: clamp(110px, 15vw, 190px);
   aspect-ratio: 129 / 178;
-  filter: drop-shadow(0 0 18px rgba(255,255,255,0.85));
+  filter: drop-shadow(0 0 24px rgba(255,255,255,0.9)) drop-shadow(0 0 8px rgba(80,220,255,0.8));
   animation: logo-breathe 3.2s ease-in-out infinite;
   position: relative;
 }
@@ -237,10 +273,14 @@
   95%, 100% { transform: translate(0) scale(1); }
 }
 .gate-motto {
-  font-size: 12px;
-  letter-spacing: 0.28em;
-  color: rgba(255,255,255,0.75);
-  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
+}
+.gate-motto-2 {
+  margin-top: -12px;
+  opacity: 0.7;
 }
 .gate-prompt {
   margin-top: 8px;
@@ -249,8 +289,8 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   color: #fff;
-  background: rgba(23,74,121,0.55);
-  border: 1px solid rgba(255,255,255,0.7);
+  background: rgba(120,190,230,0.55);
+  border: 1px solid rgba(255,255,255,0.85);
   padding: 13px 34px;
   transform: skewX(var(--skew));
   cursor: pointer;

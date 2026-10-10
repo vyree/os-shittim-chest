@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AronaSLogo, GateTriangles } from './parts';
+import { GateTriangles } from './parts';
 
 export function BootGate({ onOpen }: { onOpen: () => void }) {
   const [leaving, setLeaving] = useState(false);
@@ -18,21 +18,14 @@ export function BootGate({ onOpen }: { onOpen: () => void }) {
       role="button"
       aria-label="Tap untuk membuka"
     >
+      {/* Reference image pasted exactly */}
       <div className="gate-bg" />
+      
+      {/* Overlay animations */}
       <GateTriangles />
-      <div className="gate-grid" />
-      <div className="gate-floor" />
       <div className="gate-scan" />
-
-      <div className="gate-content">
-        <div className="gate-ver">ver. アロナ</div>
-        <AronaSLogo />
-        <div className="gate-motto">WE THIRST FOR KNOWLEDGE</div>
-        <button className="gate-prompt">
-          <span>• TAP UNTUK MEMBUKA •</span>
-        </button>
-        <div className="gate-caption">SHITTIM CHEST // ACCESS GATE</div>
-      </div>
+      {/* Glitch overlay on S logo area */}
+      <div className="gate-s-glitch" />
     </div>
   );
 }
