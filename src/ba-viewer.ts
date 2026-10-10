@@ -22,10 +22,13 @@ export interface BaClipInfo {
 export interface BaCharacterDef {
   id: string;
   name: string;
-  /** URL of the .glb, e.g. '/airi_band.glb' (served from public/) */
+  /** URL of the .glb, e.g. '/airi_band.glb' (served from public/) or https://cdn.jsdelivr.net/... */
   url: string;
-  /** clip names to expose, in order — ONLY clips from this character's own GLB */
+  /** clip names to expose, in order — ONLY clips from this character's own GLB.
+   * If empty and loadAllClips is true, all animations in the GLB are exposed. */
   clips: string[];
+  /** If true and clips is empty, expose all animations found in the GLB. */
+  loadAllClips?: boolean;
   /** per-clip Y-rotation correction in radians (e.g. Airi Normal_Idle spins -90°) */
   facingCorrections?: Record<string, number>;
   /**
@@ -180,7 +183,11 @@ export class BaViewer {
     this.mixer = new THREE.AnimationMixer(root);
     this.clips.clear();
     const infos: BaClipInfo[] = [];
-    for (const name of def.clips) {
+    // If loadAllClips is set and no specific clips listed, expose all animations in the GLB
+    const clipNames = (def.loadAllClips && def.clips.length === 0)
+      ? gltf.animations.map((c) => c.name)
+      : def.clips;
+    for (const name of clipNames) {
       const clip = gltf.animations.find((c) => c.name === name);
       if (clip) {
         this.clips.set(name, clip);

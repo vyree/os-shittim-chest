@@ -1,37 +1,85 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { BaViewer, BaCharacterDef, BaClipInfo, BaStats } from '../ba-viewer';
 
-const CHARACTERS: BaCharacterDef[] = [
+/** Base URL for streaming models via jsDelivr CDN */
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/lihaohong6/BlueArchiveModels@main';
+const MODELS_JSON_URL = `${CDN_BASE}/models.json`;
+/** Fallback to raw GitHub if jsDelivr fails */
+const GH_RAW_BASE = 'https://raw.githubusercontent.com/lihaohong6/BlueArchiveModels/main';
+
+/** Local fallback characters (bundled in public/) if streaming fails */
+const LOCAL_FALLBACK: BaCharacterDef[] = [
   {
     id: 'airi',
-    name: 'Kurimura Airi',
+    name: 'Kurimura Airi (Band) [Local]',
     url: '/airi_band.glb',
     clips: ['Cafe_Walk', 'Normal_Idle', 'Cafe_Reaction'],
     facingCorrections: { 'Normal_Idle': Math.PI / 2 },
-    // Piano + piano bag are not animated in the cafe clips; they'd float at
-    // bind pose over her torso, so we remove them (wiki hide-parts equivalent).
     hiddenMeshes: ['CH0251_Instrument_Mesh', 'CH0251_Prop_Mesh'],
   },
   {
     id: 'miku',
-    name: 'Hatsune Miku',
+    name: 'Hatsune Miku [Local]',
     url: '/miku_fixed.glb',
     clips: ['Cafe_Walk', 'Cafe_Idle', 'Cafe_Reaction'],
   },
   {
     id: 'arisu',
-    name: 'Arisu — Battle Carrier',
+    name: 'Arisu — Battle Carrier [Local]',
     url: '/arisu_carrier_fixed.glb',
     clips: ['Walk', 'Idle'],
   },
 ];
+
+/** Parse "Airi (Band).glb" -> { name: "Airi", variant: "Band" } */
+function parseFilename(filename: string): { name: string; variant: string; display: string } {
+  const base = filename.replace(/\.glb$/i, '');
+  const match = base.match(/^([^(]+?)\s*(?:\((.+)\))?$/);
+  if (!match) return { name: base, variant: 'Base', display: base };
+  const name = match[1].trim();
+  const variant = match[2]?.trim() || 'Base';
+  // Clean up nested parens: "Arisu (Battle) (Carrier)" -> variant "Battle Carrier"
+  const cleanVariant = variant.replace(/\)\s*\(/g, ' ');
+  const display = variant === 'Base' ? name : `${name} (${cleanVariant})`;
+  return { name, variant: cleanVariant, display };
+}
+
+/** Build BaCharacterDef from filename, preserving known special configs */
+function buildDef(filename: string, id: string): BaCharacterDef {
+  const { display } = parseFilename(filename);
+  const url = `${CDN_BASE}/${encodeURIComponent(filename)}`;
+  
+  // Preserve special configs for known characters
+  const special: Record<string, Partial<BaCharacterDef>> = {
+    'Airi (Band).glb': {
+      clips: ['Cafe_Walk', 'Normal_Idle', 'Cafe_Reaction'],
+      facingCorrections: { 'Normal_Idle': Math.PI / 2 },
+      hiddenMeshes: ['CH0251_Instrument_Mesh', 'CH0251_Prop_Mesh'],
+    },
+  };
+  
+  const spec = special[filename] || {};
+  return {
+    id,
+    name: display,
+    url,
+    clips: spec.clips || [],
+    loadAllClips: !spec.clips,
+    facingCorrections: spec.facingCorrections,
+    hiddenMeshes: spec.hiddenMeshes,
+  };
+}
 
 export default function CharacterLab({ onBack }: { onBack: () => void }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<BaViewer | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const [charId, setCharId] = useState('airi');
+  const [characters, setCharacters] = useState<BaCharacterDef[]>([]);
+  const [charId, setCharId] = useState('');
+  const [loadingChars, setLoadingChars] = useState(true);
+  const [charError, setCharError] = useState<string | null>(null);
+  const [loadingModel, setLoadingModel] = useState(false);
   const [clips, setClips] = useState<BaClipInfo[]>([]);
   const [clipName, setClipName] = useState('');
   const [mode, setMode] = useState<'WALK' | 'ROTATE'>('WALK');
@@ -42,6 +90,45 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
   const [pos, setPos] = useState(0); // 0..1000
   const [stats, setStats] = useState<BaStats>({ time: 0, duration: 0, fps: 0, playing: true });
   const scrubbing = useRef(false);
+
+  // Fetch character list from CDN on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchCharacters() {
+      try {
+        const res = await fetch(MODELS_JSON_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const filenames = Object.keys(data).filter((f) => f.toLowerCase().endsWith('.glb'));
+        // Sort alphabetically by display name
+        filenames.sort((a, b) => {
+          const da = parseFilename(a).display;
+          const db = parseFilename(b).display;
+          return da.localeCompare(db);
+        });
+        const defs = filenames.map((fn, idx) => buildDef(fn, `stream_${idx}`));
+        if (!cancelled) {
+          setCharacters(defs);
+          setCharError(null);
+          // Auto-select first character
+          if (defs.length > 0) {
+            setCharId(defs[0].id);
+          }
+        }
+      } catch (e) {
+        console.warn('[CharacterLab] Failed to fetch models.json, using local fallback:', e);
+        if (!cancelled) {
+          setCharacters(LOCAL_FALLBACK);
+          setCharError('Gagal load daftar online, pakai model lokal.');
+          setCharId(LOCAL_FALLBACK[0].id);
+        }
+      } finally {
+        if (!cancelled) setLoadingChars(false);
+      }
+    }
+    fetchCharacters();
+    return () => { cancelled = true; };
+  }, []);
 
   // Create viewer once
   useEffect(() => {
@@ -63,27 +150,38 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
   const loadChar = useCallback(async (id: string) => {
     const v = viewerRef.current;
     if (!v) return;
-    const def = CHARACTERS.find((c) => c.id === id)!;
-    const infos = await v.loadCharacter(def);
-    setClips(infos);
-    if (infos.length > 0) {
-      setClipName(infos[0].name);
-      v.playClip(infos[0].name);
+    const def = characters.find((c) => c.id === id);
+    if (!def) return;
+    setLoadingModel(true);
+    try {
+      const infos = await v.loadCharacter(def);
+      setClips(infos);
+      if (infos.length > 0) {
+        setClipName(infos[0].name);
+        v.playClip(infos[0].name);
+      } else {
+        setClipName('');
+      }
+    } catch (e) {
+      console.error('[CharacterLab] Failed to load model:', def.name, e);
+      setCharError(`Gagal load ${def.name}. Coba karakter lain.`);
+    } finally {
+      setLoadingModel(false);
     }
     setMode('WALK');
     v.setOrbitEnabled(false);
-  }, []);
+  }, [characters]);
 
-  // Load initial character when viewer is ready
+  // Load character when list is ready and charId is set
   useEffect(() => {
+    if (loadingChars || !charId || !viewerRef.current) return;
     const t = setTimeout(() => loadChar(charId), 100);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadingChars, charId, loadChar]);
 
   const onCharChange = (id: string) => {
     setCharId(id);
-    loadChar(id);
+    // loadChar will be triggered by the effect above
   };
 
   const onClipChange = (name: string) => {
@@ -148,7 +246,7 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
   const rangeFill = (val: number, min: number, max: number) =>
     ({ '--fill': `${((val - min) / (max - min)) * 100}%` } as React.CSSProperties);
 
-  const charDef = CHARACTERS.find((c) => c.id === charId)!;
+  const charDef = characters.find((c) => c.id === charId);
 
   return (
     <div className="lab-root" ref={wrapRef}>
@@ -164,7 +262,7 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
           <span>ROTATE</span>
         </button>
         <div className="spacer" />
-        <div className="char-name"><span>{charDef.name}</span></div>
+        <div className="char-name"><span>{charDef?.name || (loadingChars ? 'Loading...' : 'No character')}</span></div>
         <button className="btn" onClick={onResetView}><span>⟳ Reset View</span></button>
         <button className="btn" onClick={onBack}><span>‹ Back</span></button>
       </div>
@@ -173,12 +271,17 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
         {/* side panel */}
         <div className="side-panel">
           <div>
-            <div className="field-label">CHARACTER</div>
-            <select value={charId} onChange={(e) => onCharChange(e.target.value)}>
-              {CHARACTERS.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <div className="field-label">CHARACTER {characters.length > 0 && `(${characters.length})`}</div>
+            {loadingChars ? (
+              <div className="hint">Loading character list...</div>
+            ) : (
+              <select value={charId} onChange={(e) => onCharChange(e.target.value)}>
+                {characters.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            )}
+            {charError && <div className="hint" style={{ color: '#f0a' }}>{charError}</div>}
           </div>
           <div>
             <div className="field-label">ANIMATION</div>
@@ -213,6 +316,16 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
         {/* 3D viewport */}
         <div className="viewport-wrap">
           <div ref={viewportRef} style={{ width: '100%', height: '100%' }} />
+          {loadingModel && (
+            <div style={{
+              position: 'absolute', inset: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(6,11,20,0.7)', color: '#7fb8e8',
+              fontSize: 14, letterSpacing: '0.1em', zIndex: 5,
+            }}>
+              ⏳ Loading model...
+            </div>
+          )}
           {mode === 'ROTATE' && (
             <div className="orbit-arrows">
               <button className="btn" onClick={() => viewerRef.current?.nudgeAzimuth(-1)}>
