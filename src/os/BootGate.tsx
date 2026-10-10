@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
-import { GateTriangles } from './parts';
+import { GateTriangles, GateSGlitchOverlay } from './parts';
 
-export function BootGate({ onOpen }: { onOpen: () => void }) {
+export function BootGate({
+  onOpen,
+  onUnlock,
+}: {
+  onOpen: () => void;
+  onUnlock?: () => void;
+}) {
   const [leaving, setLeaving] = useState(false);
 
-  const handleTap = () => {
+  const handleTap = async () => {
     if (leaving) return;
+    onUnlock?.();
     setLeaving(true);
     // match gate-leave animation (.72s + .18s delay)
     setTimeout(onOpen, 880);
+    try { await document.documentElement.requestFullscreen(); } catch {}
+    try { await (screen.orientation as unknown as { lock: (m: string) => Promise<void> }).lock('landscape'); } catch {}
   };
 
   return (
@@ -20,12 +29,13 @@ export function BootGate({ onOpen }: { onOpen: () => void }) {
     >
       {/* Reference image pasted exactly */}
       <div className="gate-bg" />
-      
+
       {/* Overlay animations */}
       <GateTriangles />
       <div className="gate-scan" />
-      {/* Glitch overlay on S logo area */}
-      <div className="gate-s-glitch" />
+
+      {/* SVG "S" RGB-split glitch overlay positioned directly over the S logo */}
+      <GateSGlitchOverlay />
     </div>
   );
 }

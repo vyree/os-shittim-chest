@@ -1,18 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from './icons';
+import { usePWAInstall, WEBAPP_ICON_URL } from './usePWAInstall';
 
 export type OsView = 'home' | 'features' | 'lab';
 
 export function TopConsole({ onInfo }: { onInfo: () => void }) {
+  const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
+
   return (
     <div className="top-console">
       <div className="brand-ribbon">
+        <img
+          src={WEBAPP_ICON_URL}
+          alt="Arona OS Icon"
+          className="brand-webapp-icon"
+          referrerPolicy="no-referrer"
+        />
         <span className="notch" />
-        <span>SHITTIM CHEST <span className="slash">//</span> OS</span>
+        <span>ARONA <span className="slash">//</span> OS SHITTIM CHEST</span>
       </div>
-      <button className="icon-btn" onClick={onInfo} aria-label="Info">
-        <Icon name="info" />
-      </button>
+
+      <div className="top-console-actions">
+        {!isInstalled && isInstallable && (
+          <button className="install-webapp-btn" onClick={install} title="Install Arona OS">
+            <span>INSTALL APP</span>
+          </button>
+        )}
+        {!isInstalled && !isInstallable && isIOS && (
+          <button
+            className="install-webapp-btn"
+            onClick={() => setShowIOSGuide(true)}
+            title="Install on iOS"
+          >
+            <span>INSTALL iOS</span>
+          </button>
+        )}
+        <button className="icon-btn" onClick={onInfo} aria-label="Info">
+          <Icon name="info" />
+        </button>
+      </div>
+
+      {showIOSGuide && (
+        <div className="ios-guide-modal" onClick={() => setShowIOSGuide(false)}>
+          <div className="ios-guide-card" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={WEBAPP_ICON_URL}
+              alt="Arona OS Icon"
+              className="ios-guide-icon"
+              referrerPolicy="no-referrer"
+            />
+            <h3>Install Arona OS</h3>
+            <p>
+              1. Tap tombol <strong>Share</strong> di bar Safari.<br />
+              2. Pilih <strong>Add to Home Screen</strong> untuk memasang Arona OS.
+            </p>
+            <button className="install-webapp-btn" onClick={() => setShowIOSGuide(false)}>
+              <span>TUTUP</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -48,6 +96,21 @@ export function HomeScreen() {
         <div className="kicker">DASH / 01</div>
         <h1 className="page-title">Home</h1>
       </div>
+
+      <div className="home-webapp-badge">
+        <img
+          src={WEBAPP_ICON_URL}
+          alt="Arona OS WebApp Icon"
+          className="home-webapp-img"
+          referrerPolicy="no-referrer"
+        />
+        <div className="home-webapp-meta">
+          <div className="kicker">ARONA OS // SYSTEM CORE</div>
+          <div className="home-webapp-title">Arona OS</div>
+          <div className="home-webapp-sub">Arona - OS Shittim Chest</div>
+        </div>
+      </div>
+
       <div className="os-ornament" aria-hidden>
         <div className="ring" />
         <div className="sq" />

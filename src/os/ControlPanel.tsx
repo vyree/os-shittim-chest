@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from './icons';
 import type { OsView } from './screens';
+import { usePWAInstall, WEBAPP_ICON_URL } from './usePWAInstall';
 
 interface Row {
   id: string;
@@ -33,6 +34,7 @@ export function ControlPanel({
   musicLabel: string;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const { isInstallable, isInstalled, install } = usePWAInstall();
 
   const handleRow = (row: Row) => {
     setSelected(row.id);
@@ -49,9 +51,17 @@ export function ControlPanel({
       <div className="sheet-backdrop" onClick={onClose} />
       <div className="side-sheet" role="dialog" aria-label="Control Panel">
         <div className="sheet-head">
-          <div>
-            <div className="kicker">SYSTEM MENU</div>
-            <h2>Control Panel</h2>
+          <div className="sheet-head-brand">
+            <img
+              src={WEBAPP_ICON_URL}
+              alt="Shittim Chest OS Icon"
+              className="sheet-webapp-icon"
+              referrerPolicy="no-referrer"
+            />
+            <div>
+              <div className="kicker">SYSTEM MENU</div>
+              <h2>Control Panel</h2>
+            </div>
           </div>
           <button className="sheet-close" onClick={onClose} aria-label="Close">
             <span>✕</span>
@@ -73,6 +83,17 @@ export function ControlPanel({
               <span className="chev">›</span>
             </button>
           ))}
+
+          {!isInstalled && isInstallable && (
+            <button className="sheet-row accent" onClick={install}>
+              <span className="hex"><Icon name="cube" size={20} /></span>
+              <span className="meta">
+                <span className="t">Install WebApp</span><br />
+                <span className="d">Pasang Shittim Chest OS ke perangkat</span>
+              </span>
+              <span className="pill on">INSTALL</span>
+            </button>
+          )}
 
           {/* Now Playing / music toggle */}
           <button className="sheet-row accent" onClick={onToggleMusic}>

@@ -16,7 +16,8 @@
 
 /* ---------- app shell (page backdrop) ---------- */
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,62 +133,138 @@
   from { transform: scale(1.018); }
   to { transform: scale(1.045); }
 }
-/* S logo glitch overlay - positioned over the S in the reference image */
+/* S logo SVG RGB-split glitch overlay — positioned directly over the S on gate-bg */
 .gate-s-glitch {
   position: absolute;
   left: 50%;
   top: 42%;
-  width: 120px;
-  height: 160px;
+  width: clamp(105px, 11.5vw, 155px);
+  aspect-ratio: 129 / 178;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  animation: s-glitch 5.2s steps(1) infinite;
+  z-index: 3;
 }
-@keyframes s-glitch {
-  0%, 89% { 
+
+.gate-s-glitch .s-rgb-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.gate-s-glitch .s-rgb-red {
+  filter: drop-shadow(-2px 0 6px rgba(255, 42, 109, 0.75));
+  animation: s-rgb-glitch-red 4.2s steps(1) infinite;
+}
+
+.gate-s-glitch .s-rgb-cyan {
+  filter: drop-shadow(2px 0 6px rgba(0, 240, 255, 0.8));
+  animation: s-rgb-glitch-cyan 4.2s steps(1) infinite;
+}
+
+.gate-s-glitch .s-rgb-slice {
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.85));
+  animation: s-rgb-glitch-slice 3.6s steps(1) infinite;
+}
+
+@keyframes s-rgb-glitch-red {
+  0%, 84%, 93%, 100% {
     opacity: 0;
-    transform: translate(-50%, -50%);
+    transform: translate(0, 0);
+    clip-path: inset(0 0 100% 0);
   }
-  90% { 
-    opacity: 1;
-    transform: translate(calc(-50% - 4px), calc(-50% + 2px));
-    background: linear-gradient(90deg, rgba(255,60,120,0.3) 0%, transparent 50%, rgba(60,220,255,0.3) 100%);
-    clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+  85% {
+    opacity: 0.88;
+    transform: translate(-4px, 1px);
+    clip-path: polygon(0 6%, 100% 6%, 100% 28%, 0 28%, 0 58%, 100% 58%, 100% 84%, 0 84%);
   }
-  92% { 
-    opacity: 1;
-    transform: translate(calc(-50% + 4px), calc(-50% - 2px));
-    background: linear-gradient(90deg, rgba(60,220,255,0.3) 0%, transparent 50%, rgba(255,60,120,0.3) 100%);
-    clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+  88% {
+    opacity: 0.92;
+    transform: translate(4px, -2px);
+    clip-path: polygon(0 22%, 100% 22%, 100% 48%, 0 48%, 0 72%, 100% 72%, 100% 95%, 0 95%);
   }
-  94% { 
-    opacity: 0.5;
-    transform: translate(calc(-50% - 2px), -50%);
-  }
-  95%, 100% { 
-    opacity: 0;
-    transform: translate(-50%, -50%);
+  91% {
+    opacity: 0.75;
+    transform: translate(-3px, 1px);
+    clip-path: polygon(0 12%, 100% 12%, 100% 36%, 0 36%);
   }
 }
 
-/* Small moving triangles overlay */
+@keyframes s-rgb-glitch-cyan {
+  0%, 84%, 93%, 100% {
+    opacity: 0;
+    transform: translate(0, 0);
+    clip-path: inset(0 0 100% 0);
+  }
+  85% {
+    opacity: 0.88;
+    transform: translate(4px, -1px);
+    clip-path: polygon(0 14%, 100% 14%, 100% 40%, 0 40%, 0 66%, 100% 66%, 100% 92%, 0 92%);
+  }
+  88% {
+    opacity: 0.92;
+    transform: translate(-5px, 2px);
+    clip-path: polygon(0 4%, 100% 4%, 100% 26%, 0 26%, 0 50%, 100% 50%, 100% 78%, 0 78%);
+  }
+  91% {
+    opacity: 0.78;
+    transform: translate(3px, -1px);
+    clip-path: polygon(0 44%, 100% 44%, 100% 74%, 0 74%);
+  }
+}
+
+@keyframes s-rgb-glitch-slice {
+  0%, 76%, 84%, 100% {
+    opacity: 0;
+    transform: translate(0, 0);
+    clip-path: inset(0 0 100% 0);
+  }
+  78% {
+    opacity: 0.85;
+    transform: translate(-5px, 0);
+    clip-path: polygon(0 30%, 100% 30%, 100% 52%, 0 52%);
+  }
+  80% {
+    opacity: 0.9;
+    transform: translate(5px, 1px);
+    clip-path: polygon(0 8%, 100% 8%, 100% 24%, 0 24%, 0 70%, 100% 70%, 100% 88%, 0 88%);
+  }
+  82% {
+    opacity: 0.65;
+    transform: translate(-2px, -1px);
+    clip-path: polygon(0 52%, 100% 52%, 100% 68%, 0 68%);
+  }
+}
+
+/* Small proportional drifting triangles overlay (8-12s slow ease-in-out alternate) */
 .gate-triangles {
   position: absolute;
   inset: 0;
-  opacity: 0.4;
+  opacity: 0.45;
   pointer-events: none;
+  z-index: 2;
 }
 .gate-tri {
   position: absolute;
-  width: 0; height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 20px solid rgba(255,255,255,0.35);
-  animation: triangle-drift 7s ease-in-out infinite alternate;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 17px solid rgba(255, 255, 255, 0.38);
+  animation: triangle-drift 10s ease-in-out infinite alternate;
 }
 @keyframes triangle-drift {
-  from { transform: translateY(-14px) rotate(-4deg); opacity: 0.35; }
-  to { transform: translateY(14px) rotate(5deg); opacity: 0.6; }
+  from {
+    transform: translateY(-10px) rotate(-3deg);
+    opacity: 0.32;
+  }
+  to {
+    transform: translateY(10px) rotate(4deg);
+    opacity: 0.58;
+  }
 }
 /* white grid fading downward */
 .gate-grid {
@@ -730,6 +807,254 @@
   display: flex;
   flex-direction: column;
   animation: view-enter 0.5s ease-out 0.06s backwards;
+}
+
+/* WebApp icon & PWA install styles */
+.brand-webapp-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+  transform: skewX(12deg);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.top-console-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.install-webapp-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--mui-blue), var(--mui-blue-dark));
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transform: skewX(var(--skew));
+  box-shadow: 0 4px 12px rgba(54, 164, 248, 0.35);
+  transition: transform 0.2s, filter 0.2s;
+}
+.install-webapp-btn > span {
+  display: inline-block;
+  transform: skewX(12deg);
+}
+.install-webapp-btn:hover {
+  filter: brightness(1.08);
+}
+
+.home-webapp-badge {
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px 14px 14px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(54, 164, 248, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(23, 74, 121, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.home-webapp-img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  border-radius: 14px;
+  filter: drop-shadow(0 4px 10px rgba(54, 164, 248, 0.3));
+}
+
+.home-webapp-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.home-webapp-sub {
+  font-size: 12px;
+  color: #4a6a8a;
+  margin-top: 2px;
+}
+
+.sheet-head-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sheet-webapp-icon {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 3px 8px rgba(54, 164, 248, 0.35));
+}
+
+.ios-guide-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(6, 11, 20, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.ios-guide-card {
+  background: #fff;
+  color: var(--navy);
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ios-guide-icon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+/* ============================================================
+   PORTRAIT LOCK OVERLAY (Black screen + Rotate to Continue)
+   ============================================================ */
+.portrait-lock-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 99999;
+  background: #000000;
+  color: #ffffff;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: max(32px, env(safe-area-inset-top));
+  padding-right: max(32px, env(safe-area-inset-right));
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  padding-left: max(32px, env(safe-area-inset-left));
+  user-select: none;
+  touch-action: none;
+}
+
+.portrait-lock-overlay.active {
+  display: flex;
+}
+
+@media (orientation: portrait) {
+  .portrait-lock-overlay {
+    display: flex;
+  }
+}
+
+.portrait-lock-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 320px;
+}
+
+.rotate-phone-icon {
+  width: 72px;
+  height: 72px;
+  color: #ffffff;
+  animation: rotate-phone-anim 2.2s ease-in-out infinite;
+}
+
+@keyframes rotate-phone-anim {
+  0%, 15% {
+    transform: rotate(0deg);
+  }
+  55%, 80% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.portrait-lock-title {
+  font-family: 'Fredoka', 'Segoe UI', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ffffff;
+}
+
+.portrait-lock-sub {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.headphones-badge {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(54, 164, 248, 0.12);
+  border: 1px solid rgba(54, 164, 248, 0.45);
+  color: #dff2ff;
+  font-family: 'Fredoka', 'Segoe UI', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 20px rgba(54, 164, 248, 0.18);
+}
+
+.headphones-icon {
+  width: 20px;
+  height: 20px;
+  color: #36a4f8;
+  flex-shrink: 0;
+  animation: headphones-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes headphones-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(54, 164, 248, 0.4));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(54, 164, 248, 0.85));
+  }
+}
+
+/* Mobile landscape optimization so tablet frame fits phone landscape screen */
+@media (max-height: 540px) and (orientation: landscape) {
+  .app-shell {
+    padding: 6px;
+  }
+  .shittim-device {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    aspect-ratio: auto;
+    border-radius: 18px;
+    padding: 8px;
+  }
 }
 
 /* reduced motion */
