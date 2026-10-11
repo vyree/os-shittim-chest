@@ -155,10 +155,13 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
     setLoadingModel(true);
     try {
       const infos = await v.loadCharacter(def);
-      setClips(infos);
-      if (infos.length > 0) {
-        setClipName(infos[0].name);
-        v.playClip(infos[0].name);
+      const uniqueInfos = infos.filter(
+        (c, idx, arr) => arr.findIndex((x) => x.name === c.name) === idx
+      );
+      setClips(uniqueInfos);
+      if (uniqueInfos.length > 0) {
+        setClipName(uniqueInfos[0].name);
+        v.playClip(uniqueInfos[0].name);
       } else {
         setClipName('');
       }
@@ -286,8 +289,8 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
           <div>
             <div className="field-label">ANIMATION</div>
             <select value={clipName} onChange={(e) => onClipChange(e.target.value)}>
-              {clips.map((c) => (
-                <option key={c.name} value={c.name}>
+              {clips.map((c, idx) => (
+                <option key={`${c.name}-${idx}`} value={c.name}>
                   {c.name} · {c.duration.toFixed(2)}s
                 </option>
               ))}
@@ -295,9 +298,9 @@ export default function CharacterLab({ onBack }: { onBack: () => void }) {
           </div>
           <div>
             <div className="clip-buttons">
-              {clips.map((c) => (
+              {clips.map((c, idx) => (
                 <button
-                  key={c.name}
+                  key={`${c.name}-${idx}`}
                   className={`clip-btn ${c.name === clipName ? 'active' : ''}`}
                   onClick={() => onClipChange(c.name)}
                 >

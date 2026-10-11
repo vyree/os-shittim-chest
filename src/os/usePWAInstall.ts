@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import aronaIconAsset from '../assets/images/webapp_icon_arona_1791637193126.jpg';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-export const WEBAPP_ICON_URL = '/src/assets/images/webapp_icon_arona_1791637193126.jpg';
+export const WEBAPP_ICON_URL: string = '/icon-180.png';
+export const WEBAPP_ICON_FALLBACK: string = aronaIconAsset;
 
 export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);

@@ -57,6 +57,11 @@ export function ControlPanel({
               alt="Shittim Chest OS Icon"
               className="sheet-webapp-icon"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                if (!e.currentTarget.src.endsWith('/icon-180.png')) {
+                  e.currentTarget.src = '/icon-180.png';
+                }
+              }}
             />
             <div>
               <div className="kicker">SYSTEM MENU</div>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 /** Tablet bezel frame — wraps every screen. */
 export function TabletFrame({ children }: { children: React.ReactNode }) {
@@ -13,99 +13,73 @@ export function TabletFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Shared faceted "S" SVG geometry matching the gate S logo. */
-function SLogoGeometry() {
-  return (
-    <>
-      <path d="M28 12 H88 L106 28 L92 42 H28 Z" />
-      <path d="M28 12 L42 28 V42 H28 Z" />
-      <path d="M88 12 L106 28 V44 L92 42 Z" />
-      <path d="M42 42 H92 L78 68 H42 Z" />
-      <path d="M42 42 L56 68 V84 L42 68 Z" />
-      <path d="M42 68 H92 L106 84 L92 100 H42 Z" />
-      <path d="M92 68 L106 84 V100 L92 100 Z" />
-      <path d="M56 100 H92 L78 126 H56 Z" />
-      <path d="M56 100 L70 126 V142 L56 126 Z" />
-      <path d="M28 126 H78 L96 142 L82 158 H28 Z" />
-      <path d="M28 126 L42 142 V158 H28 Z" />
-      <path d="M78 126 L96 142 V158 L82 158 Z" />
-    </>
-  );
-}
-
-/** The glowing Arona "S" logo as inline SVG (glitch handled by CSS). */
-export function AronaSLogo({ glitch = true }: { glitch?: boolean }) {
-  return (
-    <svg
-      className={`gate-logo${glitch ? ' glitching' : ''}`}
-      viewBox="0 0 129 178"
-      fill="none"
-      aria-label="Arona S logo"
-    >
-      <g fill="#ffffff">
-        <SLogoGeometry />
-      </g>
-      <g stroke="#4de3ff" strokeWidth="2.5" opacity="0.9" fill="none">
-        <path d="M92 42 L106 28" />
-        <path d="M92 100 L106 84" />
-        <path d="M42 68 L56 84" />
-      </g>
-    </svg>
-  );
+interface GateTriDef {
+  left: number;
+  top: number;
+  dir: 'up' | 'down';
+  delay: number;
+  dur: number;
+  opacity: number;
 }
 
 /**
- * 3-layer stacked SVG "S" RGB-split glitch overlay positioned directly over
- * the S logo on the gate background.
+ * Triangles mapped to cover the background triangles on gate-bg.jpg
+ * with a slight, gentle floating motion.
  */
-export function GateSGlitchOverlay() {
-  return (
-    <div className="gate-s-glitch" aria-hidden="true">
-      <svg className="s-rgb-layer s-rgb-red" viewBox="0 0 129 178" fill="none">
-        <g fill="#ff2a6d">
-          <SLogoGeometry />
-        </g>
-      </svg>
-      <svg className="s-rgb-layer s-rgb-cyan" viewBox="0 0 129 178" fill="none">
-        <g fill="#00f0ff">
-          <SLogoGeometry />
-        </g>
-      </svg>
-      <svg className="s-rgb-layer s-rgb-slice" viewBox="0 0 129 178" fill="none">
-        <g fill="#e8fbff" stroke="#00f0ff" strokeWidth="1.5">
-          <SLogoGeometry />
-        </g>
-      </svg>
-    </div>
-  );
-}
+const GATE_TRIANGLES: GateTriDef[] = [
+  // Upper-left cluster
+  { left: 11.2, top: 2.5, dir: 'up', delay: -0.4, dur: 4.8, opacity: 0.24 },
+  { left: 18.8, top: 3.2, dir: 'down', delay: -1.7, dur: 5.2, opacity: 0.22 },
+  { left: 26.6, top: 3.2, dir: 'down', delay: -2.9, dur: 4.6, opacity: 0.18 },
+  { left: 7.4, top: 12.2, dir: 'up', delay: -1.1, dur: 5.4, opacity: 0.22 },
+  { left: 15.0, top: 12.2, dir: 'up', delay: -3.3, dur: 5.0, opacity: 0.20 },
+  { left: 11.2, top: 21.8, dir: 'down', delay: -2.2, dur: 4.9, opacity: 0.22 },
+  { left: 18.8, top: 21.8, dir: 'down', delay: -0.8, dur: 5.5, opacity: 0.22 },
+  { left: 34.4, top: 21.8, dir: 'down', delay: -3.7, dur: 4.7, opacity: 0.18 },
+  { left: 22.8, top: 31.2, dir: 'up', delay: -1.5, dur: 5.1, opacity: 0.24 },
+  { left: 18.8, top: 40.5, dir: 'down', delay: -2.6, dur: 5.3, opacity: 0.22 },
 
-/** Small proportional drifting triangles overlay for the gate (slow 8-12s drift). */
+  // Lower-left cluster
+  { left: 3.5, top: 49.5, dir: 'up', delay: -0.9, dur: 5.0, opacity: 0.22 },
+  { left: 7.4, top: 58.8, dir: 'down', delay: -2.4, dur: 4.8, opacity: 0.20 },
+  { left: 18.8, top: 58.8, dir: 'down', delay: -3.8, dur: 5.2, opacity: 0.18 },
+  { left: 11.2, top: 68.0, dir: 'up', delay: -1.3, dur: 5.4, opacity: 0.20 },
+  { left: 15.0, top: 83.5, dir: 'up', delay: -2.8, dur: 4.9, opacity: 0.22 },
+  { left: 26.6, top: 83.5, dir: 'up', delay: -0.6, dur: 5.3, opacity: 0.18 },
+
+  // Upper-right cluster
+  { left: 57.6, top: 3.2, dir: 'down', delay: -1.9, dur: 5.0, opacity: 0.18 },
+  { left: 61.5, top: 12.2, dir: 'up', delay: -0.7, dur: 4.8, opacity: 0.22 },
+  { left: 65.4, top: 21.8, dir: 'down', delay: -3.1, dur: 5.3, opacity: 0.22 },
+  { left: 61.5, top: 36.5, dir: 'up', delay: -2.0, dur: 4.9, opacity: 0.22 },
+  { left: 73.2, top: 3.2, dir: 'down', delay: -1.2, dur: 5.1, opacity: 0.22 },
+  { left: 77.0, top: 12.2, dir: 'up', delay: -2.7, dur: 4.7, opacity: 0.25 },
+  { left: 73.2, top: 21.8, dir: 'down', delay: -0.3, dur: 5.4, opacity: 0.20 },
+  { left: 69.3, top: 31.2, dir: 'up', delay: -3.5, dur: 5.0, opacity: 0.20 },
+  { left: 81.0, top: 21.8, dir: 'down', delay: -1.6, dur: 4.8, opacity: 0.22 },
+  { left: 84.8, top: 31.2, dir: 'up', delay: -2.3, dur: 5.2, opacity: 0.26 },
+  { left: 88.8, top: 3.2, dir: 'down', delay: -0.9, dur: 5.5, opacity: 0.18 },
+
+  // Lower-right cluster
+  { left: 88.8, top: 49.5, dir: 'up', delay: -1.4, dur: 4.9, opacity: 0.22 },
+  { left: 77.0, top: 58.8, dir: 'down', delay: -3.0, dur: 5.1, opacity: 0.22 },
+  { left: 92.6, top: 58.8, dir: 'down', delay: -0.5, dur: 4.8, opacity: 0.24 },
+  { left: 84.8, top: 68.0, dir: 'up', delay: -2.1, dur: 5.3, opacity: 0.20 },
+  { left: 92.6, top: 74.5, dir: 'up', delay: -3.4, dur: 5.0, opacity: 0.26 },
+  { left: 88.8, top: 83.5, dir: 'down', delay: -1.8, dur: 4.7, opacity: 0.22 },
+];
+
 export function GateTriangles() {
-  const tris = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < 14; i++) {
-      const left = (i * 83 + 11) % 94;
-      const top = (i * 47 + 8) % 88;
-      const size = 10 + ((i * 9) % 14);
-      const delay = -((i * 1.6) % 8);
-      const dur = 8 + ((i * 0.75) % 4); // 8s - 12s slow drift
-      arr.push({ left, top, size, delay, dur, key: i });
-    }
-    return arr;
-  }, []);
   return (
-    <div className="gate-triangles" aria-hidden>
-      {tris.map((t) => (
+    <div className="gate-triangles" aria-hidden="true">
+      {GATE_TRIANGLES.map((t, idx) => (
         <div
-          key={t.key}
-          className="gate-tri"
+          key={idx}
+          className={`gate-tri gate-tri-${t.dir}`}
           style={{
             left: `${t.left}%`,
             top: `${t.top}%`,
-            borderLeftWidth: t.size / 2,
-            borderRightWidth: t.size / 2,
-            borderBottomWidth: t.size * 0.86,
+            opacity: t.opacity,
             animationDelay: `${t.delay}s`,
             animationDuration: `${t.dur}s`,
           }}

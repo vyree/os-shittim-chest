@@ -16,6 +16,11 @@ export function TopConsole({ onInfo }: { onInfo: () => void }) {
           alt="Arona OS Icon"
           className="brand-webapp-icon"
           referrerPolicy="no-referrer"
+          onError={(e) => {
+            if (!e.currentTarget.src.endsWith('/icon-180.png')) {
+              e.currentTarget.src = '/icon-180.png';
+            }
+          }}
         />
         <span className="notch" />
         <span>ARONA <span className="slash">//</span> OS SHITTIM CHEST</span>
@@ -49,6 +54,11 @@ export function TopConsole({ onInfo }: { onInfo: () => void }) {
               alt="Arona OS Icon"
               className="ios-guide-icon"
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                if (!e.currentTarget.src.endsWith('/icon-180.png')) {
+                  e.currentTarget.src = '/icon-180.png';
+                }
+              }}
             />
             <h3>Install Arona OS</h3>
             <p>
@@ -103,6 +113,11 @@ export function HomeScreen() {
           alt="Arona OS WebApp Icon"
           className="home-webapp-img"
           referrerPolicy="no-referrer"
+          onError={(e) => {
+            if (!e.currentTarget.src.endsWith('/icon-180.png')) {
+              e.currentTarget.src = '/icon-180.png';
+            }
+          }}
         />
         <div className="home-webapp-meta">
           <div className="kicker">ARONA OS // SYSTEM CORE</div>

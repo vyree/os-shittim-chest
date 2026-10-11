@@ -127,187 +127,202 @@
   position: absolute;
   inset: 0;
   background: url('/gate-bg.jpg') center/cover no-repeat;
-  animation: gate-image-breathe 10s ease-in-out infinite alternate;
-}
-@keyframes gate-image-breathe {
-  from { transform: scale(1.018); }
-  to { transform: scale(1.045); }
-}
-/* S logo SVG RGB-split glitch overlay — positioned directly over the S on gate-bg */
-.gate-s-glitch {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  width: clamp(105px, 11.5vw, 155px);
-  aspect-ratio: 129 / 178;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 3;
 }
 
-.gate-s-glitch .s-rgb-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
-
-.gate-s-glitch .s-rgb-red {
-  filter: drop-shadow(-2px 0 6px rgba(255, 42, 109, 0.75));
-  animation: s-rgb-glitch-red 4.2s steps(1) infinite;
-}
-
-.gate-s-glitch .s-rgb-cyan {
-  filter: drop-shadow(2px 0 6px rgba(0, 240, 255, 0.8));
-  animation: s-rgb-glitch-cyan 4.2s steps(1) infinite;
-}
-
-.gate-s-glitch .s-rgb-slice {
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.85));
-  animation: s-rgb-glitch-slice 3.6s steps(1) infinite;
-}
-
-@keyframes s-rgb-glitch-red {
-  0%, 84%, 93%, 100% {
-    opacity: 0;
-    transform: translate(0, 0);
-    clip-path: inset(0 0 100% 0);
-  }
-  85% {
-    opacity: 0.88;
-    transform: translate(-4px, 1px);
-    clip-path: polygon(0 6%, 100% 6%, 100% 28%, 0 28%, 0 58%, 100% 58%, 100% 84%, 0 84%);
-  }
-  88% {
-    opacity: 0.92;
-    transform: translate(4px, -2px);
-    clip-path: polygon(0 22%, 100% 22%, 100% 48%, 0 48%, 0 72%, 100% 72%, 100% 95%, 0 95%);
-  }
-  91% {
-    opacity: 0.75;
-    transform: translate(-3px, 1px);
-    clip-path: polygon(0 12%, 100% 12%, 100% 36%, 0 36%);
-  }
-}
-
-@keyframes s-rgb-glitch-cyan {
-  0%, 84%, 93%, 100% {
-    opacity: 0;
-    transform: translate(0, 0);
-    clip-path: inset(0 0 100% 0);
-  }
-  85% {
-    opacity: 0.88;
-    transform: translate(4px, -1px);
-    clip-path: polygon(0 14%, 100% 14%, 100% 40%, 0 40%, 0 66%, 100% 66%, 100% 92%, 0 92%);
-  }
-  88% {
-    opacity: 0.92;
-    transform: translate(-5px, 2px);
-    clip-path: polygon(0 4%, 100% 4%, 100% 26%, 0 26%, 0 50%, 100% 50%, 100% 78%, 0 78%);
-  }
-  91% {
-    opacity: 0.78;
-    transform: translate(3px, -1px);
-    clip-path: polygon(0 44%, 100% 44%, 100% 74%, 0 74%);
-  }
-}
-
-@keyframes s-rgb-glitch-slice {
-  0%, 76%, 84%, 100% {
-    opacity: 0;
-    transform: translate(0, 0);
-    clip-path: inset(0 0 100% 0);
-  }
-  78% {
-    opacity: 0.85;
-    transform: translate(-5px, 0);
-    clip-path: polygon(0 30%, 100% 30%, 100% 52%, 0 52%);
-  }
-  80% {
-    opacity: 0.9;
-    transform: translate(5px, 1px);
-    clip-path: polygon(0 8%, 100% 8%, 100% 24%, 0 24%, 0 70%, 100% 70%, 100% 88%, 0 88%);
-  }
-  82% {
-    opacity: 0.65;
-    transform: translate(-2px, -1px);
-    clip-path: polygon(0 52%, 100% 52%, 100% 68%, 0 68%);
-  }
-}
-
-/* Small proportional drifting triangles overlay (8-12s slow ease-in-out alternate) */
+/* Triangles positioned over the image triangles — slight, gentle movement */
 .gate-triangles {
   position: absolute;
   inset: 0;
-  opacity: 0.45;
   pointer-events: none;
   z-index: 2;
 }
+
 .gate-tri {
   position: absolute;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 17px solid rgba(255, 255, 255, 0.38);
-  animation: triangle-drift 10s ease-in-out infinite alternate;
+  width: 6.4%;
+  aspect-ratio: 1.15 / 1;
+  background: rgba(236, 248, 255, 0.85);
+  will-change: transform;
+  animation: gate-tri-slight-move 5s ease-in-out infinite alternate;
 }
-@keyframes triangle-drift {
-  from {
-    transform: translateY(-10px) rotate(-3deg);
-    opacity: 0.32;
+
+.gate-tri-up {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.gate-tri-down {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+@keyframes gate-tri-slight-move {
+  0% {
+    transform: translate3d(-3px, -4px, 0);
   }
-  to {
-    transform: translateY(10px) rotate(4deg);
-    opacity: 0.58;
+  50% {
+    transform: translate3d(3px, 2px, 0);
+  }
+  100% {
+    transform: translate3d(-2px, 5px, 0);
   }
 }
-/* white grid fading downward */
-.gate-grid {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, black 30%, transparent 85%);
-  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 85%);
-}
-/* synthwave floor */
-.gate-floor {
-  position: absolute;
-  left: -20%; right: -20%;
-  bottom: -12%;
-  height: 46%;
-  background:
-    linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
-  background-size: 52px 26px;
-  transform: rotateX(58deg);
-  transform-origin: bottom;
-  animation: gate-floor 8s linear infinite;
-  mask-image: linear-gradient(to top, black 40%, transparent 95%);
-  -webkit-mask-image: linear-gradient(to top, black 40%, transparent 95%);
-}
-@keyframes gate-floor {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 52px, 0 0; }
-}
-/* scanline sweep */
+
+/* Scanning animation from top to bottom every 4.5 seconds */
 .gate-scan {
   position: absolute;
-  left: 0; right: 0;
-  height: 90px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.35), transparent);
-  animation: gate-scan 6.4s linear infinite;
+  left: 0;
+  right: 0;
+  height: 110px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(190, 238, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.48) 50%,
+    rgba(190, 238, 255, 0.18) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+  animation: gate-scan-sweep 4.5s linear infinite;
 }
-@keyframes gate-scan {
-  from { top: -90px; }
-  to { top: 110%; }
+
+@keyframes gate-scan-sweep {
+  0% {
+    top: -120px;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}
+
+/* Full-screen glitch animation every 4.6 seconds (different timing from scan via 2.1s delay) */
+.gate-screen-glitch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  animation: gate-screen-glitch-anim 4.6s steps(1) 2.1s infinite;
+}
+
+.gate-screen-glitch::before,
+.gate-screen-glitch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/gate-bg.jpg') center/cover no-repeat;
+  pointer-events: none;
+}
+
+@keyframes gate-screen-glitch-anim {
+  0%, 84%, 95%, 100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    clip-path: none;
+    filter: none;
+  }
+  86% {
+    opacity: 0.92;
+    transform: translate3d(-8px, 0, 0);
+    clip-path: polygon(
+      0 8%, 100% 8%, 100% 22%, 0 22%,
+      0 48%, 100% 48%, 100% 64%, 0 64%,
+      0 82%, 100% 82%, 100% 94%, 0 94%
+    );
+    filter: drop-shadow(6px 0 0 rgba(0, 235, 255, 0.65)) drop-shadow(-6px 0 0 rgba(255, 60, 140, 0.65));
+  }
+  89% {
+    opacity: 0.95;
+    transform: translate3d(9px, -2px, 0);
+    clip-path: polygon(
+      0 16%, 100% 16%, 100% 34%, 0 34%,
+      0 58%, 100% 58%, 100% 76%, 0 76%
+    );
+    filter: drop-shadow(-6px 0 0 rgba(0, 235, 255, 0.7)) drop-shadow(6px 0 0 rgba(255, 60, 140, 0.7)) brightness(1.12);
+  }
+  92% {
+    opacity: 0.75;
+    transform: translate3d(-4px, 1px, 0);
+    clip-path: polygon(
+      0 32%, 100% 32%, 100% 46%, 0 46%,
+      0 72%, 100% 72%, 100% 88%, 0 88%
+    );
+    filter: drop-shadow(4px 0 0 rgba(120, 230, 255, 0.6));
+  }
+}
+
+/* Soft blue loading animation at the bottom of the gate screen on click */
+.gate-loading-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  padding: 18px 36px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(to top, rgba(18, 60, 102, 0.38), transparent);
+  pointer-events: none;
+  animation: gate-loading-fade-in 0.2s ease-out;
+}
+
+@keyframes gate-loading-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gate-loading-label {
+  font-family: 'Fredoka', 'Segoe UI', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: #e6f7ff;
+  text-shadow: 0 1px 8px rgba(54, 164, 248, 0.65);
+}
+
+.gate-loading-track {
+  width: min(560px, 84%);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(114, 204, 255, 0.45);
+}
+
+.gate-loading-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8fd8ff 0%, #5bc0f8 50%, #b8e8ff 100%);
+  box-shadow: 0 0 14px rgba(120, 210, 255, 0.95);
+  animation: gate-loading-progress 1.05s cubic-bezier(0.22, 0.8, 0.32, 1) forwards;
+}
+
+@keyframes gate-loading-progress {
+  0% {
+    width: 0%;
+  }
+  45% {
+    width: 62%;
+  }
+  100% {
+    width: 100%;
+  }
 }
 
 .gate-content {

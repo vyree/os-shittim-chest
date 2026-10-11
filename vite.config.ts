@@ -1,30 +1,57 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const iconSrc = path.resolve(process.cwd(), 'src/assets/images/webapp_icon_arona_1791637193126.jpg');
-const publicDir = path.resolve(process.cwd(), 'public');
-if (fs.existsSync(iconSrc) && fs.existsSync(publicDir)) {
-  for (const name of [
+function syncPublicIcons(): void {
+  const rootDir = process.cwd();
+  const publicDir = path.resolve(rootDir, 'public');
+  const candidates = [
+    path.resolve(rootDir, 'src/assets/images/webapp_icon_arona_1791637193126.jpg'),
+    path.resolve(publicDir, 'icon-180.png'),
+    path.resolve(publicDir, 'favicon.ico'),
+  ];
+
+  const sourceIcon = candidates.find((p) => fs.existsSync(p));
+  if (!sourceIcon || !fs.existsSync(publicDir)) return;
+
+  const targets = [
     'favicon.ico',
     'icon-180.png',
     'pwa-192x192.png',
     'pwa-512x512.png',
     'pwa-maskable-512x512.png',
-  ]) {
+  ];
+
+  for (const name of targets) {
     const dest = path.join(publicDir, name);
+    if (path.resolve(sourceIcon) === path.resolve(dest)) continue;
     try {
-      fs.copyFileSync(iconSrc, dest);
+      fs.copyFileSync(sourceIcon, dest);
     } catch {
       // ignore copy errors in read-only environments
     }
   }
 }
 
+function publicIconsPlugin(): Plugin {
+  return {
+    name: 'arona-sync-public-icons',
+    buildStart() {
+      syncPublicIcons();
+    },
+    configureServer() {
+      syncPublicIcons();
+    },
+  };
+}
+
+syncPublicIcons();
+
 export default defineConfig({
   plugins: [
+    publicIconsPlugin(),
     react(),
     VitePWA({
       registerType: 'autoUpdate',
